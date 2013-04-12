@@ -23,8 +23,13 @@ namespace EyeCandy {
             _time = 0;
             _drawSphere = true;
             
-            _shader =  ci::gl::GlslProg( ci::app::loadAsset("shaders/passThru_vert.vs"), ci::app::loadAsset("shaders/white.fs"));
+            try{
+            _shader =  ci::gl::GlslProg( ci::app::loadAsset("shaders/passThru_vert.vs"), ci::app::loadAsset("shaders/whiteCircle.fs"));
            // _shader =  ci::gl::GlslProg( ci::app::loadAsset("shaders/passThru_vert.vs"), ci::app::loadAsset("shaders/white.fs"));
+            }catch( const std::exception &e ) {
+                cinder::app::console() << e.what() << std::endl;
+                return;
+            }
             
             VboMesh::Layout layout;
             layout.setStaticPositions();
@@ -42,6 +47,7 @@ namespace EyeCandy {
             _time += 0.1;
             
             gl::color(1,1,1);
+            gl::enableAlphaBlending();
             
             if(_drawSphere){
                 _shader.bind();

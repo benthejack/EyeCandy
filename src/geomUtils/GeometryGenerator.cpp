@@ -6,8 +6,11 @@
 //  Copyright (c) 2013 Ben Jack. All rights reserved.
 //
 
+
+#include <float.h>
 #include "GeometryGenerator.h"
 #include "cinder/Vector.h"
+#include "boost/scoped_array.hpp"
 
 using namespace ci;
 
@@ -167,23 +170,37 @@ namespace EyeCandy { namespace GeomUtils{
 
     }
     
-    std::vector<ci::Vec3f> GeometryGenerator::getTriCentroids(){
+    std::vector<ci::Vec3f> GeometryGenerator::getTriCentroids(bool i_perVertex){
         
         std::vector<Vec3f> centroids;
+        
+        if(i_perVertex)
+            centroids.reserve(_indexCount);
         
         register int ind1, ind2, ind3;
         register float x, y, z;
         
+        Vec3f cent;
+        
         for(int i = 0; i < _indexCount; i+=3){
-            
             ind1 = _indices[i]*3; ind2 = _indices[i+1]*3; ind3 = _indices[i+2]*3;
             x = (_vertices[ind1] + _vertices[ind2] + _vertices[ind3])/3.0;
             y = (_vertices[ind1+1] + _vertices[ind2+1] + _vertices[ind3+1])/3.0;
             z = (_vertices[ind1+2] + _vertices[ind2+2] + _vertices[ind3+2])/3.0;
             
-            centroids.push_back(Vec3f(x, y, z));
+            cent = Vec3f(x, y, z);
+            
+            if(i_perVertex){
+                centroids.push_back(cent);
+                centroids.push_back(cent);
+                centroids.push_back(cent);
+
+            }else{
+                centroids.push_back(cent);
+            }
+            
         }
-        
+            
         return centroids;
         
     }
@@ -198,12 +215,37 @@ namespace EyeCandy { namespace GeomUtils{
                         
             output.push_back(verts[i]);
             norms[i].normalize();
-            //norms[i] *= i_length;
+            norms[i] *= i_length;
             output.push_back(verts[i]+norms[i]);
         }
         
         return output;
         
+    }
+    
+    std::vector<ci::Vec3f> GeometryGenerator::getBounds(){
+        
+        float minX = 100000000000, minY = 100000000000, minZ = 100000000000;
+        float maxX = -100000000000, maxY = -100000000000, maxZ = -100000000000;
+        
+        for(int i = 0; i < _vertexCount; i+=3){
+            minX = _vertices[i]   < minX ? _vertices[i] : minX;
+            minY = _vertices[i+1] < minY ? _vertices[i+1] : minY;
+            minZ = _vertices[i+2] < minZ ? _vertices[i+2] : minZ;
+
+            maxX = _vertices[i]   > maxX ? _vertices[i] : maxX;
+            maxY = _vertices[i+1] > maxY ? _vertices[i+1] : maxY;
+            maxZ = _vertices[i+2] > maxZ ? _vertices[i+2] : maxZ;
+        }
+        
+        Vec3f min(minX, minY, minZ);
+        Vec3f max(maxX, maxY, maxZ);
+        
+        std::vector<Vec3f> vecOut;
+        vecOut.push_back(min);
+        vecOut.push_back(max);
+        
+        return vecOut;
     }
     
     

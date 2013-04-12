@@ -7,6 +7,9 @@
 //
 
 #include <cstdio>
+
+#include "cinder/stream.h"
+
 #include "boost/algorithm/string/split.hpp"
 #include "boost/algorithm/string/classification.hpp"
 
@@ -80,8 +83,8 @@ namespace EyeCandy { namespace GeomUtils{
         pullFloatsFromStrArray(_normals,  sNormals);
         pullFloatsFromStrArray(_uvs, sUvs);
             
-        correctIndicesArray(_normals, normalIndices, _indices, _indexCount);
-        correctIndicesArray(_uvs, textureIndices, _indices,  _indexCount);
+        correctIndicesArray(_normals, normalIndices, _indices, _indexCount, 3);
+        correctIndicesArray(_uvs, textureIndices, _indices,  _indexCount, 2);
         
          //ci::app::console() << "verts:" << sVertices.size() << "  norms:"<< sNormals.size()<< "  tex:"<<sUvs.size()<< std::endl;
         
@@ -91,20 +94,27 @@ namespace EyeCandy { namespace GeomUtils{
     
     void ObjGenerator::pullIndicesFromStrArray(boost::shared_array<u_int32_t> i_output, vector<string>& i_strs, int i_offset){
         
-        vector<string> runningTotal;
+        vector<string> strsTest;
+        boost::split(strsTest, i_strs[0], boost::is_any_of("/"));
         
-        
-        for(vector<string>::iterator it = i_strs.begin(); it != i_strs.end(); ++it){
+        if(strsTest.size() >= i_offset){
+
+            vector<string> runningTotal;
             
-            vector<string> strs;
-            boost::split(strs, *it , boost::is_any_of("/"));
-            runningTotal.insert(runningTotal.end(), strs.begin()+(i_offset-1), strs.begin()+i_offset);
+            for(vector<string>::iterator it = i_strs.begin(); it != i_strs.end(); ++it){
+                
+                vector<string> strs;
+                boost::split(strs, *it , boost::is_any_of("/"));
+                //std::cout<<"len:"<<strs.size()<<" 1:"<<strs[0]<<" 2:"<<strs[1]<<" 3:"<<strs[2]<<endl;
+                runningTotal.insert(runningTotal.end(), strs.begin()+(i_offset-1), strs.begin()+i_offset);
+                
+            }
             
-        }
-        
-        int i = 0;
-        for(vector<string>::iterator it = runningTotal.begin(); it != runningTotal.end(); ++it, ++i){
-            i_output[i] = atoi(it->c_str())-1;
+            int i = 0;
+            for(vector<string>::iterator it = runningTotal.begin(); it != runningTotal.end(); ++it, ++i){
+                i_output[i] = atoi(it->c_str())-1;
+            }
+            
         }
         
     }
@@ -129,18 +139,20 @@ namespace EyeCandy { namespace GeomUtils{
         
     }
     
-    void ObjGenerator::correctIndicesArray(boost::shared_array<float>& i_input, boost::shared_array<u_int32_t>& i_wrongIndices, boost::shared_array<u_int32_t>& i_rightIndices, int i_indexCount){
+    void ObjGenerator::correctIndicesArray(boost::shared_array<float>& i_input, boost::shared_array<u_int32_t>& i_wrongIndices, boost::shared_array<u_int32_t>& i_rightIndices, int i_indexCount, int i_step){
         
         boost::shared_array<float> tempArr = boost::shared_array<float>(new float[i_indexCount*3]);
         
-        register int rInd, wInd;
+        register int rInd, wInd, j;
         
-        for(int i = 0; i < i_indexCount; i++){
-            rInd = (i_rightIndices[i]*3);
-            wInd = (i_wrongIndices[i]*3);
-            tempArr[rInd] = i_input[wInd];
-            tempArr[rInd+1] = i_input[wInd+1];
-            tempArr[rInd+2] = i_input[wInd+2];
+        for(int i = 0; i < i_indexCount; ++i){
+            rInd = (i_rightIndices[i]*i_step);
+            wInd = (i_wrongIndices[i]*i_step);
+            
+           // cout<<"right:"<<rInd<<" wrong:"<<wInd<<endl;
+            for(j = 0; j < i_step; ++j)
+                tempArr[rInd+j] = i_input[wInd+j];
+
         }
         
         i_input = tempArr;

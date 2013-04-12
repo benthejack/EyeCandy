@@ -1,5 +1,6 @@
 #include "GeometryRenderer.h"
 
+
 using namespace ci;
 using namespace ci::gl;
 
@@ -9,6 +10,19 @@ namespace EyeCandy{
         
         GeometryRenderer::GeometryRenderer(GeometryGenerator_ptr i_geom, Shader_ptr i_shader, bool i_loadNormals){
             
+            VboMesh::Layout tLayout = gl::VboMesh::Layout();
+            init(i_geom, tLayout, i_shader, i_loadNormals);
+            
+        }
+        
+        
+        GeometryRenderer::GeometryRenderer(GeometryGenerator_ptr i_geom, cinder::gl::VboMesh::Layout& i_layout, Shader_ptr i_shader, bool i_loadNormals){
+            
+            init(i_geom, i_layout, i_shader, i_loadNormals);
+            
+        }
+        
+        void GeometryRenderer::init(GeometryGenerator_ptr i_geom, cinder::gl::VboMesh::Layout& i_layout, Shader_ptr i_shader, bool i_loadNormals){
             _useShader = true;
             _wireframe = false;
             _showNormals = false;
@@ -22,20 +36,43 @@ namespace EyeCandy{
             if(i_shader)
                 _shader = i_shader;
             
-            VboMesh::Layout layout;
-            layout.setStaticPositions();
-            layout.setStaticIndices();
-            layout.setStaticTexCoords2d();
-            layout.setStaticNormals();
+            if(i_layout.isDefaults()){
+                i_layout.setStaticPositions();
+                i_layout.setStaticIndices();
+                i_layout.setStaticTexCoords2d();
+                i_layout.setStaticNormals();
+            }
             
-            _generator->generate();
-            _mesh = _generator->getVBO(layout);
+            if(!_generator->isGenerated())
+                _generator->generate();
+            
+            _mesh = _generator->getVBO(i_layout);
             
             if (i_loadNormals) {
                 _normalMesh = _generator->getNormalsVBO();
             }
-            
         }
+
+        
+        void GeometryRenderer::addCustomVec3f(std::vector<Vec3f>& i_custom, std::string i_name){
+            
+            GLuint loc = _shader->getAttribLocation(i_name);
+            
+            _customLocations.push_back(i_name);
+            int pos = _customLocations.size()-1;
+            _mesh->setCustomDynamicLocation(pos, loc);
+
+            gl::VboMesh::VertexIter iter = _mesh->mapVertexBuffer();
+            int vertCount = _mesh->getNumVertices();
+            
+            for( int i = 0; i < vertCount; i++) {
+                
+                iter.setCustomVec3f(pos, i_custom[i]);
+                ++iter;
+            }
+
+        }
+        
         
         void GeometryRenderer::toggleShader(){
             _useShader = !_useShader;

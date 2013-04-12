@@ -48,8 +48,9 @@ namespace EyeCandy{
             std::vector<ci::Vec3f> getNormalsVector();
             std::vector<ci::uint32_t> getIndicesVector();
             std::vector<ci::Vec2f> getUvsVector();
-            std::vector<ci::Vec3f> getTriCentroids();
-            std::vector<ci::Vec3f> getNormalLines(float i_length = 20.0);
+            std::vector<ci::Vec3f> getTriCentroids(bool i_perVertex = true);
+            std::vector<ci::Vec3f> getNormalLines(float i_length = 0.2);
+            std::vector<ci::Vec3f> getBounds();
             
             //------------------------------getters/setters-------------------------------//
             void useSplitFaces(bool i_split = true){
@@ -59,6 +60,10 @@ namespace EyeCandy{
             void useFaceNormals(bool i_faceNormals = true){
                 _faceNormals = i_faceNormals;
                 _splitFaces = i_faceNormals ? true : _splitFaces;
+            }
+            
+            bool isGenerated(){
+                return _generated;
             }
             
             boost::shared_array<float> vertices(){

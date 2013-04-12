@@ -14,12 +14,9 @@
 #ifndef __EYECANDY_GEOMETRYRENDERER_H_
 #define __EYECANDY_GEOMETRYRENDERER_H_
 
-#include <vector>
 #include "boost/Function.hpp"
 #include "Renderable.h"
 #include "GeometryGenerator.h"
-#include "cinder/gl/GLSLProg.h"
-#include "cinder/gl/Vbo.h"
 
 using namespace EyeCandy::GfxUtils;
 
@@ -37,6 +34,11 @@ namespace EyeCandy{
             GeometryRenderer(){};
             GeometryRenderer(GeometryGenerator_ptr i_geom, Shader_ptr i_shader = Shader_ptr(), bool i_loadNormals = false);
             
+            GeometryRenderer(GeometryGenerator_ptr i_geom, cinder::gl::VboMesh::Layout& layout, Shader_ptr i_shader = Shader_ptr(), bool i_loadNormals = false);
+            
+            void init(GeometryGenerator_ptr i_geom, cinder::gl::VboMesh::Layout& layout, Shader_ptr i_shader, bool i_loadNormals);
+
+            
             ~GeometryRenderer(){
                 _shader.reset();
                 _generator.reset();
@@ -52,6 +54,7 @@ namespace EyeCandy{
             
             void toggleShader();
             void renderWireFrame(bool i_wireframe = true){_wireframe = i_wireframe;}
+            void addCustomVec3f(std::vector<ci::Vec3f>& i_custom, std::string i_name);
             
             void setShaderFunc( boost::function<void (Shader_ptr)> i_shaderFunc = NULL ){
                 _shaderFunc = i_shaderFunc;
@@ -71,6 +74,8 @@ namespace EyeCandy{
             
             boost::shared_ptr<cinder::gl::VboMesh> _mesh;
             boost::shared_ptr<cinder::gl::VboMesh> _normalMesh;
+            
+            std::vector<std::string> _customLocations;
             
             boost::function<void (Shader_ptr)> _shaderFunc;
             boost::function<void ()> _glSetupFunc, _glPulldownFunc;

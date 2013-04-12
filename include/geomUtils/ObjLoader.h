@@ -16,12 +16,10 @@
 #ifndef __EYECANDY_OBJLOADER_H_
 #define __EYECANDY_OBJLOADER_H_
 
-#include "cinder/stream.h"
+
 #include "GeometryGenerator.h"
 #include <vector>
 #include <boost/shared_array.hpp>
-
-
 
 namespace EyeCandy{
     namespace GeomUtils{
@@ -49,7 +47,7 @@ namespace EyeCandy{
             
             /* this is to rearrange the normal and uv arrays to point to the correct values. The OBJ file has 3 indices so these need to be crunched to be the same as the vertex
              position indices*/
-            void correctIndicesArray(boost::shared_array<float>& i_input, boost::shared_array<u_int32_t>& i_wrongIndices, boost::shared_array<u_int32_t>& i_rightIndices, int i_indexCount);
+            void correctIndicesArray(boost::shared_array<float>& i_input, boost::shared_array<u_int32_t>& i_wrongIndices, boost::shared_array<u_int32_t>& i_rightIndices, int i_indexCount, int i_step);
             
             cinder::IStreamFileRef _file;
             

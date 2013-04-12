@@ -87,7 +87,11 @@ namespace EyeCandy{
             
             _fbo->unbindFramebuffer();
         
-
+            applyPostEffects();
+            
+        }
+        
+        void Layer::applyPostEffects(){
             
             //----adding post effects----
             gl::color(1,1,1);
@@ -113,20 +117,20 @@ namespace EyeCandy{
                         
                         _postEffects[i]->bind();
                         _postShaderSetterFunctions[i](_postEffects[i]);
-                    
+                        
                         gl::drawSolidRect(Rectf(0,_height, _width, 0));
-                    
+                        
                         _postEffects[i]->unbind();
                         
                     }else if(_unPremult){
-                    //unpremult pass
-                     //   cinder::app::console() << "blah"<<std::endl;
-
+                        //unpremult pass
+                        //   cinder::app::console() << "blah"<<std::endl;
+                        
                         _unPremultShader->bind();
                         _unPremultShader->uniform("tex0", 0);
-                            gl::drawSolidRect(Rectf(0,_height, _width, 0));
+                        gl::drawSolidRect(Rectf(0,_height, _width, 0));
                         _unPremultShader->unbind();
-        
+                        
                     }
                     
                     _currentFbo->unbindFramebuffer();
@@ -134,8 +138,6 @@ namespace EyeCandy{
                 }
             }
             
-            
-                
         }
         
         
@@ -199,7 +201,7 @@ namespace EyeCandy{
                 currTex.enableAndBind();
                 
                 gl::pushMatrices();
-                gl::draw(currTex, bounds);
+                gl::draw(currTex);
                 gl::popMatrices();
                 
                 currTex.disable();

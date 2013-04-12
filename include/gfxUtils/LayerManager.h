@@ -62,7 +62,8 @@ namespace EyeCandy{
             void removeRenderable(Renderable_ptr i_r);
             
             virtual void render();
-            
+            void applyPostEffects();
+
             
         private:
             //--------------------------class members-------------------------
@@ -111,6 +112,7 @@ namespace EyeCandy{
             void removeLayer(Layer_ptr);
             
             virtual void render();
+
             
         private:
             //--------------------------class members-------------------------
