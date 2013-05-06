@@ -58,24 +58,24 @@ namespace EyeCandy { namespace GeomUtils{
     
     std::vector<ci::Vec3f> GeometryGenerator::getPositionsVector(){
         
-        std::vector<Vec3f> positions;
-        
-        if(_splitFaces || _faceNormals){
-            
-            register int ind;
-            
-            for(int i = 0; i < _indexCount; ++i ){
-                ind = _indices[i];
-                positions.push_back(Vec3f(_vertices[ind*3], _vertices[ind*3+1], _vertices[ind*3+2]));
-            }
-            
-        }else{
-            for(int i = 0; i < _vertexCount; ++i ){
-                positions.push_back(Vec3f(_vertices[i*3], _vertices[i*3+1], _vertices[i*3+2]));
+        if(_positionsVector.size() == 0){
+            if(_splitFaces || _faceNormals){
+                
+                register int ind;
+                
+                for(int i = 0; i < _indexCount; ++i ){
+                    ind = _indices[i];
+                    _positionsVector.push_back(Vec3f(_vertices[ind*3], _vertices[ind*3+1], _vertices[ind*3+2]));
+                }
+                
+            }else{
+                for(int i = 0; i < _vertexCount; ++i ){
+                    _positionsVector.push_back(Vec3f(_vertices[i*3], _vertices[i*3+1], _vertices[i*3+2]));
+                }
             }
         }
         
-        return positions;
+        return _positionsVector;        
         
     }
 
@@ -84,15 +84,15 @@ namespace EyeCandy { namespace GeomUtils{
         std::vector<Vec3f> normals;
         
         if(_faceNormals){
-            
-            std::vector<ci::Vec3f> positions = getPositionsVector();
-            
+                        
             ci::Vec3f one, two, three, norm;
             
-            for(int i = 0; i < positions.size(); i+=3){
-                one = positions[i];
-                two = positions[i+1];
-                three = positions[i+2];
+            getPositionsVector();
+            
+            for(int i = 0; i < _positionsVector.size(); i+=3){
+                one = _positionsVector[i];
+                two = _positionsVector[i+1];
+                three = _positionsVector[i+2];
                 
                 norm = (two-one).cross(three-one);
                 normals.push_back(norm); normals.push_back(norm); normals.push_back(norm);
@@ -125,24 +125,25 @@ namespace EyeCandy { namespace GeomUtils{
     
     std::vector<u_int32_t> GeometryGenerator::getIndicesVector(){
         
-        std::vector<ci::Vec3f> positions = getPositionsVector();
-        std::vector<uint32_t> inds;
-        
-        if(_splitFaces || _faceNormals){
-                        
-            for(int i = 0; i < positions.size(); ++i ){
-                inds.push_back(i);
+        getPositionsVector();
+    
+        if(_indicesVector.size() == 0){
+            if(_splitFaces || _faceNormals){
+                            
+                for(int i = 0; i < _positionsVector.size(); ++i ){
+                    _indicesVector.push_back(i);
+                }
+                
+            }else{
+                for(int i = 0; i < _indexCount; ++i){
+                    _indicesVector.push_back(_indices[i]);
+                }
             }
             
-        }else{
-            for(int i = 0; i < _indexCount; ++i){
-                inds.push_back(_indices[i]);
-            }
+            std::cout<<"INDICES:"<<_indicesVector.size()<<std::endl;
         }
         
-        std::cout<<"INDICES:"<<inds.size()<<std::endl;
-        
-        return inds;
+        return _indicesVector;
     }
     
     std::vector<ci::Vec2f> GeometryGenerator::getUvsVector(){
@@ -207,16 +208,16 @@ namespace EyeCandy { namespace GeomUtils{
     
     std::vector<ci::Vec3f> GeometryGenerator::getNormalLines(float i_length){
         
-        std::vector<Vec3f> verts = getPositionsVector();
+        getPositionsVector();
         std::vector<Vec3f> norms = getNormalsVector();
         std::vector<Vec3f> output;
         
-        for(int i = 0; i < verts.size(); ++i){
+        for(int i = 0; i < _positionsVector.size(); ++i){
                         
-            output.push_back(verts[i]);
+            output.push_back(_positionsVector[i]);
             norms[i].normalize();
             norms[i] *= i_length;
-            output.push_back(verts[i]+norms[i]);
+            output.push_back(_positionsVector[i]+norms[i]);
         }
         
         return output;

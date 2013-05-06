@@ -20,6 +20,7 @@
 #include "GeometryGenerator.h"
 #include <vector>
 #include <boost/shared_array.hpp>
+#include "boost/regex.hpp"
 
 namespace EyeCandy{
     namespace GeomUtils{
@@ -39,6 +40,8 @@ namespace EyeCandy{
 
             
         private:
+            
+            int searchFloatsByRegex(std::string & i_file, boost::regex & i_expression, boost::shared_array<float> i_array, int i_stride);
             
             void pullIndicesFromStrArray(boost::shared_array<u_int32_t>, std::vector<std::string>&, int i_offset);
             void pullFloatsFromStrArray(boost::shared_array<float>, std::vector<std::string>&);

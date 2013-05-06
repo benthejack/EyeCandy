@@ -12,15 +12,16 @@
 namespace EyeCandy{ namespace GeomUtils{
 
     StripGenerator::StripGenerator(){
-        
+        _centered = false;
     }
     
     void StripGenerator::generate(bool i_yFlipped){
         
     }
 
-    TriStripGenerator::TriStripGenerator(Vec2i i_size, Vec2i i_segs)
+    TriStripGenerator::TriStripGenerator(Vec2i i_size, Vec2i i_segs, bool i_centered)
     {
+        _centered = i_centered;
         _size = i_size;
         _segs = i_segs;
         
@@ -37,27 +38,41 @@ namespace EyeCandy{ namespace GeomUtils{
         
         register float xSpace = _size.x/_segs.x;
         register float ySpace = _size.y/_segs.y;
-        register float xP, yP;
+        register float xP, yP, tXp, tYp;
         
         register int ind = 0, indVert = 0, indUV = 0, vertCount = 0;
+
         
-        for(int i = 0; i < _segs.x; i++){
-            for(int j = 0; j < _segs.y; j++){
+        register int halfX = _segs.x / 2;
+        register int halfY = _segs.y / 2;
+        
+        register int startX = _centered ? -halfX : 0;
+        register int startY = _centered ? -halfY : 0;
+        register int endX = _centered ? halfX : _segs.x;
+        register int endY = _centered ? halfY : _segs.y;
+        
+        halfX = _centered ? halfX : 0;
+        halfY = _centered ? halfY : 0;
+        
+        for(int i = startX; i < endX; i++){
+            for(int j = startY; j < endY; j++){
                 
                 xP = i*xSpace;
                 yP = j*ySpace;
+                tXp = (i+halfX)*xSpace;
+                tYp = (j+halfY)*ySpace;
                 
                 _normals[indVert] = 0; _vertices[indVert++] = (xP); _normals[indVert] = 0; _vertices[indVert++] = (yP); _normals[indVert] = 1; _vertices[indVert++] = (0); //topLeft
-                _uvs[indUV++] = xP/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (yP/_size.y) : yP/_size.y;
+                _uvs[indUV++] = tXp/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (tYp/_size.y) : tYp/_size.y;
                 
                 _normals[indVert] = 0; _vertices[indVert++] = (xP+xSpace); _normals[indVert] = 0; _vertices[indVert++] = (yP); _normals[indVert] = 1; _vertices[indVert++] = (0); //topRight
-                _uvs[indUV++] = (xP+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (yP/_size.y) : yP/_size.y;
+                _uvs[indUV++] = (tXp+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (tYp/_size.y) : tYp/_size.y;
                 
                 _normals[indVert] = 0; _vertices[indVert++] = (xP); _normals[indVert] = 0; _vertices[indVert++] = (yP+ySpace); _normals[indVert] = 1; _vertices[indVert++] = (0); //bottomLeft
-                _uvs[indUV++] = (xP)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((yP+ySpace)/_size.y) : (yP+ySpace)/_size.y;
+                _uvs[indUV++] = (tXp)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((tYp+ySpace)/_size.y) : (tYp+ySpace)/_size.y;
                 
                 _normals[indVert] = 0; _vertices[indVert++] =  (xP+xSpace); _normals[indVert] = 0; _vertices[indVert++] =  (yP+ySpace); _normals[indVert] = 1; _vertices[indVert++] =  (0); //bottomRight
-                _uvs[indUV++] = (xP+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((yP+ySpace)/_size.y) : (yP+ySpace)/_size.y;
+                _uvs[indUV++] = (tXp+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((tYp+ySpace)/_size.y) : (tYp+ySpace)/_size.y;
                 
                 vertCount += 4;
 
@@ -79,8 +94,10 @@ namespace EyeCandy{ namespace GeomUtils{
     }
 
 
-    DiamondTriStripGenerator::DiamondTriStripGenerator(Vec2i i_size, Vec2i i_segs)
+    DiamondTriStripGenerator::DiamondTriStripGenerator(Vec2i i_size, Vec2i i_segs, bool i_centered)
     {
+        _centered = i_centered;
+        
         _size = i_size;
         _segs = i_segs;
         
@@ -100,34 +117,47 @@ namespace EyeCandy{ namespace GeomUtils{
         register float ySpace = _size.y/_segs.y;
         register float hX = xSpace/2.0;
         register float hY = ySpace/2.0;
-        register float xP, yP, mX, mY;
+        register float xP, yP, mX, mY, tX, tY;
 
         
         register int ind = 0, indVert = 0, indUV = 0, vertCount = 0;
         
-        for(int i = 0; i < _segs.x; i++){
-            for(int j = 0; j < _segs.y; j++){
+        register int halfX = _segs.x / 2;
+        register int halfY = _segs.y / 2;
+        
+        register int startX = _centered ? -halfX : 0;
+        register int startY = _centered ? -halfY : 0;
+        register int endX = _centered ? halfX : _segs.x;
+        register int endY = _centered ? halfY : _segs.y;
+        
+        halfX = _centered ? halfX : 0;
+        halfY = _centered ? halfY : 0;
+        
+        for(int i = startX; i < endX; i++){
+            for(int j = startY; j < endY; j++){
                 
                 xP = i*xSpace;
                 yP = j*ySpace;
                 mX = i*xSpace + hX;
                 mY = j*ySpace + hY;
+                tX = (i+halfX)*xSpace;
+                tY = (j+halfY)*ySpace;
                 
                 //create the vertices
                 _normals[indVert] = 0; _vertices[indVert++] = (mX); _normals[indVert] = 0; _vertices[indVert++] = (mY); _normals[indVert] = 1; _vertices[indVert++] = (0); //midpoint
-                _uvs[indUV++] = mX/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (mY/_size.y) : mY/_size.y;
+                _uvs[indUV++] = ((i+halfX)*xSpace + hX)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (((j+halfY)*ySpace + hY)/_size.y) : (((j+halfY)*ySpace + hY)/_size.y);
                 
                 _normals[indVert] = 0; _vertices[indVert++] = (xP); _normals[indVert] = 0; _vertices[indVert++] = (yP); _normals[indVert] = 1; _vertices[indVert++] = (0); //topLeft
-                _uvs[indUV++] = xP/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (yP/_size.y) : yP/_size.y;
+                _uvs[indUV++] = tX/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (tY/_size.y) : tY/_size.y;
                 
                 _normals[indVert] = 0; _vertices[indVert++] = (xP+xSpace); _normals[indVert] = 0; _vertices[indVert++] = (yP); _normals[indVert] = 1; _vertices[indVert++] = (0); //topRight
-                _uvs[indUV++] = (xP+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (yP/_size.y) : yP/_size.y;
+                _uvs[indUV++] = (tX+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - (tY/_size.y) : tY/_size.y;
 
                 _normals[indVert] = 0; _vertices[indVert++] = (xP); _normals[indVert] = 0; _vertices[indVert++] = (yP+ySpace); _normals[indVert] = 1; _vertices[indVert++] = (0); //bottomLeft
-                _uvs[indUV++] = (xP)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((yP+ySpace)/_size.y) : (yP+ySpace)/_size.y;
+                _uvs[indUV++] = (tX)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((tY+ySpace)/_size.y) : (tY+ySpace)/_size.y;
 
                 _normals[indVert] = 0; _vertices[indVert++] =  (xP+xSpace); _normals[indVert] = 0; _vertices[indVert++] =  (yP+ySpace); _normals[indVert] = 1; _vertices[indVert++] =  (0); //bottomRight
-                _uvs[indUV++] = (xP+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((yP+ySpace)/_size.y) : (yP+ySpace)/_size.y;
+                _uvs[indUV++] = (tX+xSpace)/_size.x; _uvs[indUV++] = i_yFlipped ? 1.0 - ((tY+ySpace)/_size.y) : (tY+ySpace)/_size.y;
 
                 vertCount += 5;
                 

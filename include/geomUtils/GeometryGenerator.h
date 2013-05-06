@@ -90,6 +90,11 @@ namespace EyeCandy{
             boost::shared_array<float> _uvs;
             boost::shared_array<u_int32_t> _indices;
             
+            std::vector<ci::Vec3f> _positionsVector;
+            std::vector<ci::Vec3f> _normalsVector;
+            std::vector<ci::uint32_t> _indicesVector;
+            std::vector<ci::Vec2f> _uvsVector;
+
             int _vertexCount;
             int _indexCount;
             

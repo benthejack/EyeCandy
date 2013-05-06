@@ -51,6 +51,10 @@ namespace EyeCandy{
                 _segs = i_seg;
             }
             
+            void setCentered(){
+                _centered = true;
+            }
+            
             
             //---------------------------------------METHODS-------------------------------------
 
@@ -61,6 +65,7 @@ namespace EyeCandy{
         protected:
             Vec2f _size;
             Vec2i _segs;
+            bool _centered;
         };
         
         
@@ -69,7 +74,7 @@ namespace EyeCandy{
         public:
             
             //-------------------------------CONSTRUCTORS/DESTRUCTOR-----------------------------
-            TriStripGenerator(Vec2i i_size = Vec2i(1,1), Vec2i i_segs = Vec2i(1,1));
+            TriStripGenerator(Vec2i i_size = Vec2i(1,1), Vec2i i_segs = Vec2i(1,1), bool i_centered = false);
             ~TriStripGenerator(){};
             
             //---------------------------------------METHODS-------------------------------------
@@ -84,7 +89,7 @@ namespace EyeCandy{
         public:
             
             //-------------------------------CONSTRUCTORS/DESTRUCTOR-----------------------------
-            DiamondTriStripGenerator(Vec2i i_size = Vec2i(1,1), Vec2i i_segs = Vec2i(1,1));
+            DiamondTriStripGenerator(Vec2i i_size = Vec2i(1,1), Vec2i i_segs = Vec2i(1,1), bool i_centered = false);
             ~DiamondTriStripGenerator(){};
             
             DiamondTriStripGenerator(const DiamondTriStripGenerator &cSource)

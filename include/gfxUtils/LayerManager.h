@@ -22,10 +22,11 @@
 #include "boost/Function.hpp"
 #include "cinder/gl/Fbo.h"
 #include "Renderable.h"
+#include "PostEffect.h"
 
 namespace EyeCandy{
     namespace GfxUtils{
-
+        
         using namespace ci;
         using namespace ci::gl;
         
@@ -57,11 +58,12 @@ namespace EyeCandy{
             boost::shared_ptr<Fbo> getFbo() { return _currentFbo; }
             
             //----------------------------methods-----------------------------
-            void addPostPass(Shader_ptr i_shader, boost::function<void(Shader_ptr)> i_setterFunc);
+            void addPostPass(boost::shared_ptr<PostEffect> i_postEffect);
             void addRenderable(Renderable_ptr i_r);
             void removeRenderable(Renderable_ptr i_r);
             
             virtual void render();
+            void doUnpremult();
             void applyPostEffects();
 
             
@@ -70,8 +72,7 @@ namespace EyeCandy{
             int _width, _height;
             
             std::vector<Renderable_ptr> _renderList;
-            std::vector<Shader_ptr> _postEffects;
-            std::vector<boost::function<void(Shader_ptr)> > _postShaderSetterFunctions;
+            std::vector<boost::shared_ptr<PostEffect> > _postEffects;
             
             boost::function<void()> _glSetFunc, _glPullDownFunc;
             boost::function<void(Shader_ptr)> _glslSetFunc;

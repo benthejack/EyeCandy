@@ -48,9 +48,9 @@ namespace EyeCandy{
         }
         
         
-        void Layer::addPostPass(Shader_ptr i_shader, boost::function<void(Shader_ptr)> i_setterFunc){
-            _postEffects.push_back(i_shader);
-            _postShaderSetterFunctions.push_back(i_setterFunc);
+        void Layer::addPostPass(boost::shared_ptr<PostEffect> i_postEffect){
+            i_postEffect->setupFBOs(_fbo->getBounds());
+            _postEffects.push_back(i_postEffect);
         }
         
         void Layer::render(){
@@ -89,53 +89,34 @@ namespace EyeCandy{
         
             applyPostEffects();
             
+            if(_unPremult){
+                doUnpremult();
+            }
+            
+            
+        }
+        
+        void Layer::doUnpremult(){
+            
+            _fbo->bindFramebuffer();
+            _unPremultShader->bind();
+            _unPremultShader->uniform("tex0", 0);
+            gl::drawSolidRect(Rectf(0,_height, _width, 0));
+            _unPremultShader->unbind();
+            _fbo->unbindFramebuffer();
+            
         }
         
         void Layer::applyPostEffects(){
             
             //----adding post effects----
             gl::color(1,1,1);
-            if(_postEffects.size() > 0 || _unPremult){
+            if(_postEffects.size() > 0){
                 
-                _currentFbo = _fbo;
-                
-                for( int i = 0; i <= _postEffects.size(); i++){
-                    
-                    if (_currentFbo == _fbo || _currentFbo == _postPong) {
-                        _currentFbo == _fbo ? _fbo->bindTexture() : _postPong->bindTexture();
-                        _currentFbo = _postPing;
-                    }else{
-                        _currentFbo = _postPong;
-                        _postPing->bindTexture();
-                    }
-                    
-                    _currentFbo->bindFramebuffer();
-                    gl::clear(ColorA(0,0,0,0));
-                    
-                    //regular post effects
-                    if(i != _postEffects.size()){
-                        
-                        _postEffects[i]->bind();
-                        _postShaderSetterFunctions[i](_postEffects[i]);
-                        
-                        gl::drawSolidRect(Rectf(0,_height, _width, 0));
-                        
-                        _postEffects[i]->unbind();
-                        
-                    }else if(_unPremult){
-                        //unpremult pass
-                        //   cinder::app::console() << "blah"<<std::endl;
-                        
-                        _unPremultShader->bind();
-                        _unPremultShader->uniform("tex0", 0);
-                        gl::drawSolidRect(Rectf(0,_height, _width, 0));
-                        _unPremultShader->unbind();
-                        
-                    }
-                    
-                    _currentFbo->unbindFramebuffer();
-                    
+                for( int i = 0; i < _postEffects.size(); ++i){
+                    _postEffects[i]->apply(_fbo);
                 }
+                
             }
             
         }
@@ -198,13 +179,13 @@ namespace EyeCandy{
                 currTex =  _layers[i]->getFbo()->getTexture();
                 
 
-                currTex.enableAndBind();
+   //             currTex.enableAndBind();
                 
-                gl::pushMatrices();
+    //            gl::pushMatrices();
                 gl::draw(currTex);
-                gl::popMatrices();
+     //           gl::popMatrices();
                 
-                currTex.disable();
+    //            currTex.disable();
 
                 
             }
