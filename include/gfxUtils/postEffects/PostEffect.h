@@ -30,23 +30,18 @@ namespace EyeCandy{
         
         public:
             
-            PostEffect(){
-                
-                try{
-                    _blitter = GlslProg( ci::app::loadAsset("shaders/passThru_vert.vs"), ci::app::loadAsset("shaders/bloom/blit.fs"));
-                }catch( const std::exception &e ) {
-                    cinder::app::console() << "PostEffect constructor failed to load: "<< e.what() << std::endl;
-                    return;
-                }
-                
-            };
-            
+            PostEffect(){};
             ~PostEffect(){};
+            
+            
 
             virtual void setupFBOs(Area i_FboArea){};
             virtual void apply(boost::shared_ptr<Fbo> i_Fbo){};
             
             void blit(boost::shared_ptr<Fbo> i_FboFrom, boost::shared_ptr<Fbo> i_FboTo, bool flipTexture = false){
+                
+                if(!_blitter)
+                    setupBlitShader();
                 
                 boost::shared_ptr<Fbo> bigger = i_FboFrom->getWidth() >  i_FboTo->getWidth() ? i_FboFrom : i_FboTo;
                 
@@ -70,6 +65,16 @@ namespace EyeCandy{
             }
             
         private:
+            
+            void setupBlitShader(){
+                try{
+                    _blitter = GlslProg( ci::app::loadAsset("shaders/passThru_vert.vs"), ci::app::loadAsset("shaders/bloom/blit.fs"));
+                }catch( const std::exception &e ) {
+                    cinder::app::console() << "PostEffect constructor failed to load: "<< e.what() << std::endl;
+                    return;
+                }
+            }
+            
             GlslProg _blitter;
             
             

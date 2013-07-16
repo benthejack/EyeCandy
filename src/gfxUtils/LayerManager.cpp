@@ -9,7 +9,7 @@ namespace EyeCandy{
         Layer::Layer(int i_width, int i_height, int i_msaaLevel){
             _width = i_width;
             _height = i_height;
-            
+            _msaaLevel = i_msaaLevel;
             
             gl::Fbo::Format msaaFormat;
             
@@ -17,10 +17,7 @@ namespace EyeCandy{
                 msaaFormat.setSamples( i_msaaLevel );
             
             _fbo =  boost::shared_ptr<Fbo>(new Fbo(i_width, i_height, msaaFormat));
-            _postPing = boost::shared_ptr<Fbo>(new Fbo(i_width, i_height, msaaFormat));
-            _postPong = boost::shared_ptr<Fbo>(new Fbo(i_width, i_height, msaaFormat));
-            _currentFbo = _fbo;
-            
+                      
             _unPremult = false;
 
             
@@ -31,6 +28,33 @@ namespace EyeCandy{
             }
             
         }
+        
+        void Layer::setDeferredRender(bool i_isDeferred){
+            
+            _deferredRender = i_isDeferred;
+            gl::Fbo::Format format;
+
+            
+            if(_deferredRender){
+                format.enableColorBuffer(true, 2);
+                format.enableDepthBuffer();
+                
+                if(_msaaLevel > 0)
+                    format.setSamples( _msaaLevel );
+                
+                _fbo =  boost::shared_ptr<Fbo>(new Fbo(_width, _height, format));
+            }else{
+                format.enableColorBuffer(true, 1);
+                format.enableDepthBuffer();
+                
+                if(_msaaLevel > 0)
+                    format.setSamples( _msaaLevel );
+                
+                _fbo =  boost::shared_ptr<Fbo>(new Fbo(_width, _height, format));
+            }
+            
+        }
+        
         
         void Layer::addRenderable(Renderable_ptr i_renderable){
             _renderList.push_back(i_renderable);

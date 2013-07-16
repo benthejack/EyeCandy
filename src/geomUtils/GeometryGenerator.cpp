@@ -20,14 +20,49 @@ namespace EyeCandy { namespace GeomUtils{
         
         std::vector<ci::Vec3f> positions = getPositionsVector();
         std::vector<uint32_t> inds = getIndicesVector();
+        std::vector<ci::Vec2f> texCoords = getUvsVector();
+        std::vector<ci::Vec3f> normals = getNormalsVector();
         
         boost::shared_ptr<cinder::gl::VboMesh> mesh(new cinder::gl::VboMesh(positions.size(), inds.size(), i_layout, GL_TRIANGLES));
         
-        //this needs to change to properly read the layout
-        mesh->bufferPositions(positions);
-        mesh->bufferIndices(inds);
-        mesh->bufferTexCoords2d(0, getUvsVector());
-        mesh->bufferNormals(getNormalsVector());
+        
+        if(i_layout.hasStaticPositions()){
+            mesh->bufferPositions(positions);
+        }else{
+            
+            gl::VboMesh::VertexIter iter = mesh->mapVertexBuffer();
+            for( int x = 0; x < positions.size(); ++x ) {
+                //positions.at(x) *= 1.001;
+                iter.setPosition(positions[x]);
+                ++iter;
+            }
+        }
+        
+        if(i_layout.hasStaticIndices()){
+            mesh->bufferIndices(inds);
+        }
+        
+        if(i_layout.hasStaticTexCoords()){
+            mesh->bufferTexCoords2d(0, texCoords);
+        }else{
+            gl::VboMesh::VertexIter iter = mesh->mapVertexBuffer();
+            for( int x = 0; x < texCoords.size(); ++x ) {
+                //positions.at(x) *= 1.001;
+                iter.setTexCoord2d0(texCoords[x]);
+                ++iter;
+            }
+        }
+        
+        if(i_layout.hasStaticNormals()){
+            mesh->bufferNormals(normals);
+        }else{
+            gl::VboMesh::VertexIter iter = mesh->mapVertexBuffer();
+            for( int x = 0; x < normals.size(); ++x ) {
+                //positions.at(x) *= 1.001;
+                iter.setPosition(normals[x]);
+                ++iter;
+            }
+        }
         
         return mesh;
         

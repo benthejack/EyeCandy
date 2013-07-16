@@ -54,7 +54,7 @@ namespace EyeCandy{
         }
 
         
-        void GeometryRenderer::addCustomVec3f(std::vector<Vec3f>& i_custom, std::string i_name){
+        void GeometryRenderer::addCustomVec3f(const std::vector<Vec3f>& i_custom, std::string i_name){
             
             GLuint loc = _shader->getAttribLocation(i_name);
             

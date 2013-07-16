@@ -56,7 +56,7 @@ namespace EyeCandy{
                 _downsampledFbos.push_back(std::vector< boost::shared_ptr<Fbo> >()); _downsampledFbos.push_back(std::vector< boost::shared_ptr<Fbo> >());
                 
                 _aliasedFbo = boost::shared_ptr<Fbo>(new Fbo(i_FboArea.getWidth(), i_FboArea.getHeight(), blitterFormat));
-                
+                                
                 for(int i = 0; i < _layers; i++){
                     
                     boost::shared_ptr<Fbo> nFbo( new Fbo(i_FboArea.getWidth()/(i+(_scale-1)), i_FboArea.getHeight()/(i+(_scale-1)), blitterFormat) );

@@ -55,12 +55,13 @@ namespace EyeCandy{
             
             void setShader(Shader_ptr i_mainShader){ _mainShader = i_mainShader; }
             
-            boost::shared_ptr<Fbo> getFbo() { return _currentFbo; }
+            boost::shared_ptr<Fbo> getFbo() { return _fbo; }
             
             //----------------------------methods-----------------------------
             void addPostPass(boost::shared_ptr<PostEffect> i_postEffect);
             void addRenderable(Renderable_ptr i_r);
             void removeRenderable(Renderable_ptr i_r);
+            void setDeferredRender(bool i_isDeferred = true);
             
             virtual void render();
             void doUnpremult();
@@ -77,16 +78,18 @@ namespace EyeCandy{
             boost::function<void()> _glSetFunc, _glPullDownFunc;
             boost::function<void(Shader_ptr)> _glslSetFunc;
             
-            boost::shared_ptr<Fbo> _currentFbo;
             boost::shared_ptr<Fbo> _fbo;
-            boost::shared_ptr<Fbo> _postPing, _postPong;
             
             Shader_ptr _mainShader;
             Shader_ptr _unPremultShader;
             
+            int _msaaLevel;
+            
             float _opacity;
             bool _isMask;
             bool _unPremult;
+            
+            bool _deferredRender;
                         
         };
 
@@ -122,6 +125,8 @@ namespace EyeCandy{
             std::vector<Layer_ptr> _layers;
             int _msaaLevel;
         };
+        
+        typedef boost::shared_ptr<LayerManager> LayerManager_ptr;
         
     }
 }

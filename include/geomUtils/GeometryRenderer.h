@@ -47,14 +47,14 @@ namespace EyeCandy{
             void showNormals(bool i_showNormals=true){ _showNormals = i_showNormals; }
             
             
-            void setPosition(ci::Vec3f& i_pos){ _position = i_pos; }
-            void setScale(ci::Vec3f& i_scale) { _scale = i_scale; }
-            void setRotation(ci::Quatf& i_rotation) { _rotation = i_rotation; }
+            void setPosition(const ci::Vec3f& i_pos){ _position = i_pos; }
+            void setScale(const ci::Vec3f& i_scale) { _scale = i_scale; }
+            void setRotation(const ci::Quatf& i_rotation) { _rotation = i_rotation; }
 
             
             void toggleShader();
             void renderWireFrame(bool i_wireframe = true){_wireframe = i_wireframe;}
-            void addCustomVec3f(std::vector<ci::Vec3f>& i_custom, std::string i_name);
+            void addCustomVec3f(const std::vector<ci::Vec3f>& i_custom, std::string i_name);
             
             void setShaderFunc( boost::function<void (Shader_ptr)> i_shaderFunc = NULL ){
                 _shaderFunc = i_shaderFunc;
